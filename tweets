@@ -1,11 +1,6 @@
 #!c:/python36/python.exe
 
 import cgi,cgitb
-from os import listdir
-from os.path import isfile, join
-import time
-import dateutil.parser
-import datetime
 import json
 import re
 import codecs
@@ -134,13 +129,7 @@ try:
 	search = form['s'].value
 except:
 	search = '2022'
-
-path_to_profile = '/twitter/norsivaeb/profile_media/986973114377519104-OSd02dFr.png'
-path_to_jsonlines = 'D:/somecrazyblogger-org/twitter/norsivaeb/tweet.jl'
-path_to_this = '/a/tweets'
-user_name = 'NorSivaeb'
-
-print('<h3>@%s‎ T​w​‎eets​‌‎ <img src="%s" width="30" align="middle"/></h3>' % (user_name,path_to_profile)
+print('<h3>@‌‎n‌‎o​‌‎r‌s​‎i​‎v​‌‎a​‌eb‌‎ T​w​‎eets​‌‎ <img src="/twitter/norsivaeb/profile_media/986973114377519104-OSd02dFr.png" width="30" align="middle"/></h3>')
 print('')
 years = ['2022','2021','2020','2019','2018']
 print('| <a href="/a/tweets?s=2022">2022</a> ')
@@ -149,17 +138,16 @@ print('| <a href="/a/tweets?s=2020">2020</a> ')
 print('| <a href="/a/tweets?s=2019">2019</a> ')
 print('| <a href="/a/tweets?s=2018">2018</a> ')
 print('| ')
-print('<form style="display: inline" name="search_form" method="GET" action="%s"><input type="text" name="s" value="%s" placeholder="Search text or year"/> <input class="but" type="submit" value="go"/></form>' % (path_to_this,search))
+print('<form style="display: inline" name="search_form" method="GET" action="/a/tweets"><input type="text" name="s" value="%s" placeholder="Search text or year"/> <input class="but" type="submit" value="go"/></form>' % (search))
 stype = 0
 if search in years:
 	stype = 1
-jf = codecs.open(path_to_jsonlines, encoding='utf-8')
+jf = codecs.open('D:/somecrazyblogger-org/twitter/norsivaeb/tweet.jl', encoding='utf-8')
 tot = 0
 for l in jf:
 	j = json.loads(l)
 	if stype == 1 and j["created_at"].find(search) == -1:
 		continue
-#	elif stype == 0 and j["full_text"].find(search) == -1:
 	elif stype == 0 and re.search(search,j["full_text"],re.I) is None:
 		continue
 	try:
@@ -167,13 +155,16 @@ for l in jf:
 		tot += 1
 		if j["full_text"].find('RT @') != 0:
 			ol = re.sub(r'(https\:\/\/[\w\.\/]+)',r'<a href="\1" target="_blank">&#128279;</a>',j["full_text"])
+			if 'urls' in j['entities']:
+				for u in j['entities']['urls']:
+					ol = ol.replace(u['url'],u['expanded_url'])
 			print('<div class="entry"><span class="time">%s</span>%s</div>' % (j["created_at"],ol))
 			if 'extended_entities' in j:
 				if 'media' in j['extended_entities']:
 					url = ''
 					for jem in j['extended_entities']['media']:
 						if 'expanded_url' in jem and 'media_url' in jem:
-							v = re.sub(r'https\:\/\/twitter\.com\/%s\/status\/(\d+)\/.+' % (user_name),r'\1',jem['expanded_url'])
+							v = re.sub(r'https\:\/\/twitter\.com\/NorSivaeb\/status\/(\d+)\/.+',r'\1',jem['expanded_url'])
 							u = re.sub(r'http\:\/\/pbs\.twimg\.com\/media\/([\w\-]+\..+)',r'\1',jem['media_url'])
 							url = '/twitter/norsivaeb/tweets_media/%s-%s' % (v,u)
 							str += '<a href="%s" target="_blank"><img src="%s" width="600"/></a><br />' % (jem['expanded_url'],url)
