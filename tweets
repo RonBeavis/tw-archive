@@ -108,17 +108,6 @@ def start_page():
 def end_page():
 	print('''</center></body>\n</html>\n''')
 	
-def sorted_nicely(_l):
-    convert = lambda text: int(text) if text.isdigit() else text
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-    return sorted(_l, key = alphanum_key, reverse=True)
-
-def get_info(_p):
-	ls = [l.rstrip() for l in open(_p,'r')]
-	for l in ls:
-		if l.find('<title>') != -1:
-			return re.sub(r'\<.+?\>','',l)
-	return 'no info'
 
 start_page()
 
@@ -174,4 +163,3 @@ for l in jf:
 		pass
 print('<br /><i>tweets = %i</i>'% (tot))
 end_page()
-
